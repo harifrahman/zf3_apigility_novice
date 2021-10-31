@@ -19,7 +19,11 @@ class MeController extends AbstractActionController
     {
         $userProfile = [];
         if (! is_null($this->userProfile)) {
-            return new HalJsonModel(['uuid'  => $this->userProfile->getUuid()]);
+            return new HalJsonModel([
+                'uuid'  => $this->userProfile->getUuid(),
+                'firstName' => $this->userProfile->getFirstName(),
+                'email' => $this->userProfile->getUser()->getUsername()
+            ]);
         } else {
             return new ApiProblemResponse(new ApiProblem(404, "User Identity not found"));
         }

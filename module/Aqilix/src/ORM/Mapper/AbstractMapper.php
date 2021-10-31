@@ -54,7 +54,7 @@ abstract class AbstractMapper implements MapperInterface
      * @param  array $params
      * @return ZendPaginator
      */
-    public function fetchAll(array $params)
+    public function fetchAll(array $params, $order = null, $asc = false)
     {
     }
 
@@ -69,6 +69,20 @@ abstract class AbstractMapper implements MapperInterface
     {
         $query   = $this->fetchAll($params);
         $doctrinePaginator = new DoctrinePaginator($query, true);
+        $adapter = new DoctrinePaginatorAdapter($doctrinePaginator);
+
+        return $adapter;
+    }
+
+    /**
+     * Get Paginator Adapter
+     *
+     * @param  Doctrine\ORM\QueryBuilder $queryBuilder
+     * @return DoctrineORMModule\Paginator\Adapter\DoctrinePaginator
+     */
+    public function createPaginatorAdapter($queryBuilder)
+    {
+        $doctrinePaginator = new DoctrinePaginator($queryBuilder, true);
         $adapter = new DoctrinePaginatorAdapter($doctrinePaginator);
 
         return $adapter;

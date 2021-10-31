@@ -6,15 +6,21 @@ use ZF\Rest\AbstractResourceListener;
 use ZF\ApiProblem\ApiProblemResponse;
 use User\Mapper\UserProfile as UserProfileMapper;
 use User\V1\Service\Profile as UserProfileService;
+use Zend\Paginator\Paginator as ZendPaginator;
+use User\V1\Rest\AbstractResource;
+use Psr\Log\LoggerAwareTrait;
 
-class ProfileResource extends AbstractResourceListener
+class ProfileResource extends AbstractResource
 {
+    use LoggerAwareTrait;
     protected $userProfileMapper;
 
     protected $userProfileService;
 
-    public function __construct(UserProfileMapper $userProfileMapper, UserProfileService $userProfileService)
-    {
+    public function __construct(
+        UserProfileMapper $userProfileMapper, 
+        UserProfileService $userProfileService
+    ) {
         $this->setUserProfileMapper($userProfileMapper);
         $this->setUserProfileService($userProfileService);
     }
@@ -76,7 +82,29 @@ class ProfileResource extends AbstractResourceListener
      */
     public function fetchAll($params = [])
     {
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
+        // $userProfile = $this->fetchUserProfile();
+        // if ($userProfile === null) {
+        //     return;
+        // }
+
+        $queryParams = $params->toArray();
+
+        $order = null;
+        $asc   = false;
+        if (isset($queryParams['order'])) {
+            $order = $queryParams['order'];
+            unset($queryParams['order']);
+        }
+
+        if (isset($queryParams['ascending'])) {
+            $asc = $queryParams['ascending'];
+            unset($queryParams['ascending']);
+        }
+
+        $userProfileData = $this->getUserProfileMapper()->fetchAll($queryParams, $order, $asc);
+        // print_r(get_class_methods($this->getUserProfileMapper()));exit;
+        $paginatorAdapter = $this->getUserProfileMapper()->createPaginatorAdapter($userProfileData);
+        return new ZendPaginator($paginatorAdapter);
     }
 
     /**
@@ -130,22 +158,6 @@ class ProfileResource extends AbstractResourceListener
         $inputFilter = $this->getInputFilter();
         $this->getUserProfileService()->update($userProfile, $inputFilter);
         return $userProfile;
-    }
-
-    /**
-     * @return the $userProfileMapper
-     */
-    public function getUserProfileMapper()
-    {
-        return $this->userProfileMapper;
-    }
-
-    /**
-     * @param UserProfileMapper $userProfileMapper
-     */
-    public function setUserProfileMapper(UserProfileMapper $userProfileMapper)
-    {
-        $this->userProfileMapper = $userProfileMapper;
     }
 
     /**
