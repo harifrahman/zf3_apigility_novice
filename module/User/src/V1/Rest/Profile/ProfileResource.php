@@ -33,7 +33,28 @@ class ProfileResource extends AbstractResource
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        // return new ApiProblem(405, 'The POST method has not been defined');
+        $userProfile = $this->fetchUserProfile();
+        if (! is_null($userProfile)) {
+            $inputFilter    = $this->getInputFilter();
+            $email          = $inputFilter->getValue('email');
+
+            $emailExist  = $this->getUserProfileMapper()->fetchOneBy([
+                'user' => $email
+            ]);
+            if (! is_null($emailExist)) {
+                return new ApiProblemResponse(new ApiProblem(422, "Email sudah digunakan"));
+            }
+
+            try {
+                $user = $this->getUserProfileService()->create($inputFilter);
+            } catch (\RuntimeException $e) {
+                return new ApiProblemResponse(new ApiProblem(500, $e->getMessage()));
+            }
+
+            return $user;
+        }
+        return new ApiProblemResponse(new ApiProblem(404, "User Identity not found"));
     }
 
     /**
@@ -116,7 +137,22 @@ class ProfileResource extends AbstractResource
      */
     public function patch($id, $data)
     {
-        return new ApiProblem(405, 'The PATCH method has not been defined for individual resource');
+        $userProfile  = $this->fetchUserProfile();
+        if (is_null($userProfile)) {
+            return new ApiProblemResponse(new ApiProblem(403, "You do not have access!"));
+        }
+
+        $inputFilter = $this->getInputFilter();
+
+        $userProfileObj  = $this->getUserProfileMapper()->fetchOneBy([
+            'uuid' => $id
+        ]);
+        if (is_null($userProfileObj)) {
+            return new ApiProblemResponse(new ApiProblem(404, "User Profile Not Found"));
+        }
+        
+        $result = $this->getUserProfileService()->update($userProfileObj, $inputFilter);
+        return $result;
     }
 
     /**

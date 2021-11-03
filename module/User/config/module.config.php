@@ -471,6 +471,34 @@ return [
                 'type' => \Zend\InputFilter\FileInput::class,
                 'error_message' => 'Photo is not valid',
             ],
+            9 => [
+                'required' => true,
+                'validators' => [
+                    0 => [
+                        'name' => \Zend\Validator\EmailAddress::class,
+                        'options' => [],
+                    ],
+                ],
+                'filters' => [],
+                'name' => 'email',
+            ],
+            10 => [
+                'required' => true,
+                'validators' => [
+                    0 => [
+                        'name' => \Zend\I18n\Validator\Alnum::class,
+                        'options' => [],
+                    ],
+                    1 => [
+                        'name' => \Zend\Validator\StringLength::class,
+                        'options' => [
+                            'min' => '8',
+                        ],
+                    ],
+                ],
+                'filters' => [],
+                'name' => 'password',
+            ],
         ],
         'User\\V1\\Rpc\\UserActivation\\Validator' => [
             0 => [

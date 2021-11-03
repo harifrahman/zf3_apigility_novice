@@ -12,9 +12,17 @@ class ProfileEvent extends Event
     /**#@+
      * Profile events triggered by eventmanager
      */
+    const EVENT_CREATE_PROFILE  = 'create.profile';
+    const EVENT_CREATE_PROFILE_ERROR   = 'create.profile.error';
+    const EVENT_CREATE_PROFILE_SUCCESS = 'create.profile.success';
+
     const EVENT_UPDATE_PROFILE  = 'update.profile';
     const EVENT_UPDATE_PROFILE_ERROR   = 'update.profile.error';
     const EVENT_UPDATE_PROFILE_SUCCESS = 'update.profile.success';
+
+    const EVENT_DELETE_PROFILE  = 'delete.profile';
+    const EVENT_DELETE_PROFILE_ERROR   = 'delete.profile.error';
+    const EVENT_DELETE_PROFILE_SUCCESS = 'delete.profile.success';
     /**#@-*/
 
     /**
@@ -36,22 +44,6 @@ class ProfileEvent extends Event
      * @var \Exception
      */
     protected $exception;
-
-    /**
-     * @return the $user
-     */
-    public function getUserProfileEntity()
-    {
-        return $this->userProfileEntity;
-    }
-
-    /**
-     * @param Aqilix\ORM\Entity\EntityInterface $userProfile
-     */
-    public function setUserProfileEntity(EntityInterface $userProfile)
-    {
-        $this->userProfileEntity = $userProfile;
-    }
 
     /**
      * @return the $updateData
@@ -99,5 +91,29 @@ class ProfileEvent extends Event
     public function setException(Exception $exception)
     {
         $this->exception = $exception;
+    }
+
+    /**
+     * Get the value of userProfileEntity
+     *
+     * @return  User\Entity\UserProfile
+     */ 
+    public function getUserProfileEntity()
+    {
+        return $this->userProfileEntity;
+    }
+
+    /**
+     * Set the value of userProfileEntity
+     *
+     * @param  User\Entity\UserProfile  $userProfileEntity
+     *
+     * @return  self
+     */ 
+    public function setUserProfileEntity(\User\Entity\UserProfile $userProfileEntity)
+    {
+        $this->userProfileEntity = $userProfileEntity;
+
+        return $this;
     }
 }
