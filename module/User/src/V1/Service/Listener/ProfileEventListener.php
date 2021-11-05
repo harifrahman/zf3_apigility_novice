@@ -126,26 +126,26 @@ class ProfileEventListener implements ListenerAggregateInterface
             $entityResult = $this->getUserProfileMapper()->save($hydrateEntity);
             $event->setUserProfileEntity($entityResult);
 
-            $this->logger->log(
-                \Psr\Log\LogLevel::INFO,
-                "{function} {uuid} {userProfileUuid}",
-                [
-                    "function" => __FUNCTION__,
-                    "uuid"     => $entityResult->getUser()->getUsername(),
-                    "userProfileUuid"  => $entityResult->getUuid()
-                ]
-            );
+            // $this->logger->log(
+            //     \Psr\Log\LogLevel::INFO,
+            //     "{function} {uuid} {userProfileUuid}",
+            //     [
+            //         "function" => __FUNCTION__,
+            //         "uuid"     => $entityResult->getUser()->getUsername(),
+            //         "userProfileUuid"  => $entityResult->getUuid()
+            //     ]
+            // );
         } catch (\Exception $e) {
             $event->stopPropagation(true);
-            $this->logger->log(
-                \Psr\Log\LogLevel::ERROR,
-                "{function} {data} {message}",
-                [
-                    "data" => json_encode($entityResult),
-                    "message"  => $e->getMessage(),
-                    "function" => __FUNCTION__,
-                ]
-            );
+            // $this->logger->log(
+            //     \Psr\Log\LogLevel::ERROR,
+            //     "{function} {data} {message}",
+            //     [
+            //         "data" => json_encode($entityResult),
+            //         "message"  => $e->getMessage(),
+            //         "function" => __FUNCTION__,
+            //     ]
+            // );
             return $e;
         }
     }
@@ -177,14 +177,14 @@ class ProfileEventListener implements ListenerAggregateInterface
             $userProfile = $this->getUserProfileHydrator()->hydrate($updateData, $userProfileEntity);
             $this->getUserProfileMapper()->save($userProfile);
             $event->setUserProfileEntity($userProfile);
-            $this->logger->log(
-                \Psr\Log\LogLevel::INFO,
-                "{function} {username}",
-                [
-                    "function" => __FUNCTION__,
-                    "username" => $userProfileEntity->getUser()->getUsername()
-                ]
-            );
+            // $this->logger->log(
+            //     \Psr\Log\LogLevel::INFO,
+            //     "{function} {username}",
+            //     [
+            //         "function" => __FUNCTION__,
+            //         "username" => $userProfileEntity->getUser()->getUsername()
+            //     ]
+            // );
         } catch (\Exception $e) {
             $event->stopPropagation(true);
             return $e;
@@ -199,25 +199,25 @@ class ProfileEventListener implements ListenerAggregateInterface
 
             $checkProfile = $this->getUserProfileMapper()->fetchOneBy(['uuid' => $deletedUuid]);
             $this->getUserProfileMapper()->delete($checkProfile);
-            $this->logger->log(
-                \Psr\Log\LogLevel::INFO,
-                "{function} {uuid} {firstName} deleted!",
-                [
-                    "function" => __FUNCTION__,
-                    "uuid"     => $deletedUuid,
-                    "firstName"  => $checkProfile->getFirstName(),
-                ]
-            );
+            // $this->logger->log(
+            //     \Psr\Log\LogLevel::INFO,
+            //     "{function} {uuid} {firstName} deleted!",
+            //     [
+            //         "function" => __FUNCTION__,
+            //         "uuid"     => $deletedUuid,
+            //         "firstName"  => $checkProfile->getFirstName(),
+            //     ]
+            // );
         } catch (\Exception $e) {
             $event->stopPropagation(true);
-            $this->logger->log(
-                \Psr\Log\LogLevel::ERROR,
-                "{function} {message}",
-                [
-                    "message"  => $e->getMessage(),
-                    "function" => __FUNCTION__,
-                ]
-            );
+            // $this->logger->log(
+            //     \Psr\Log\LogLevel::ERROR,
+            //     "{function} {message}",
+            //     [
+            //         "message"  => $e->getMessage(),
+            //         "function" => __FUNCTION__,
+            //     ]
+            // );
             return $e;
         }
     }

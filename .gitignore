@@ -4,7 +4,9 @@ config/development.config.php
 data/log/*
 data/cache/*
 data/photo/*
-data/DoctrineORMModule
+data/DoctrineORMModule/Proxy
+!data/DoctrineORMModule/Migrations
+!data/DoctrineORMModule/Proxy/.gitkeep
 !data/cache/.gitkeep
 !data/photo/.gitkeep
 !data/log/.gitkeep
@@ -14,3 +16,4 @@ composer.phar
 .buildpath
 .project
 .settings
+.DS_Store

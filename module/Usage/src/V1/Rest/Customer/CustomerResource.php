@@ -2,10 +2,29 @@
 namespace Usage\V1\Rest\Customer;
 
 use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\ApiProblemResponse;
+use Zend\Paginator\Paginator as ZendPaginator;
+use User\Mapper\UserProfile as UserProfileMapper;
+use Usage\Mapper\Customer as CustomerMapper;
+use Usage\Mapper\CustomerTrait as CustomerMapperTrait;
+use User\Mapper\UserProfileTrait as UserProfileMapperTrait;
 use ZF\Rest\AbstractResourceListener;
 
 class CustomerResource extends AbstractResourceListener
 {
+    use 
+    CustomerMapperTrait,
+    UserProfileMapperTrait;
+    protected $customerService;
+
+    public function __construct(
+        UserProfileMapper $userProfileMapper,
+        CustomerMapper $customerMapper
+    ) {
+        $this->setUserProfileMapper($userProfileMapper);
+        $this->setCustomerMapper($customerMapper);
+    }
+
     /**
      * Create a resource
      *
@@ -14,7 +33,28 @@ class CustomerResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        $data = (array) $data;
+        $now = new \DateTime('now');
+        $inputFilter = $this->getInputFilter();
+
+        try {
+            
+            if (is_null($inputFilter->getValue('isActive'))) {
+                $inputFilter->get('isActive')->setValue(1);
+            }
+
+            $inputFilter->add(['name' => 'createdAt']);
+            $inputFilter->get('createdAt')->setValue($now);
+
+            $inputFilter->add(['name' => 'updatedAt']);
+            $inputFilter->get('updatedAt')->setValue($now);
+
+            $result = $this->getCustomerService()->save($inputFilter);
+        } catch (\RuntimeException $e) {
+            return new ApiProblemResponse(new ApiProblem(500, $e->getMessage()));
+        }
+
+        return $result;
     }
 
     /**
@@ -25,7 +65,18 @@ class CustomerResource extends AbstractResourceListener
      */
     public function delete($id)
     {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
+        try {
+            $customer = $this->getCustomerMapper()->fetchOneBy(['uuid' => $id]);
+            if (is_null($customer)) {
+                return new ApiProblem(404, "Data pelanggan tidak ditemukan");
+            }
+
+            return $this->getCustomerService()->delete($customer);
+        } catch (\RuntimeException $e) {
+            return new ApiProblemResponse(new ApiProblem(500, $e->getMessage()));
+        }
+
+        return $customer;
     }
 
     /**
@@ -47,7 +98,16 @@ class CustomerResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        $queryParams = [
+            'uuid' => $id,
+        ];
+
+        $customer = $this->getCustomerMapper()->fetchOneBy($queryParams);
+        if (is_null($customer)) {
+            return new ApiProblemResponse(new ApiProblem(404, "Data pelanggan tidak ditemukan"));
+        }
+
+        return $customer;
     }
 
     /**
@@ -58,7 +118,23 @@ class CustomerResource extends AbstractResourceListener
      */
     public function fetchAll($params = [])
     {
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
+        $queryParams =  $params->toArray();
+
+        $order = null;
+        $asc = false;
+
+        if (isset($queryParams['order'])) {
+            $order = $queryParams['order'];
+            unset($queryParams['order']);
+        }
+
+        if (isset($queryParams['ascending'])) {
+            $asc = $queryParams['ascending'];
+            unset($queryParams['ascending']);
+        }
+        $qb = $this->getCustomerMapper()->fetchAll($queryParams, $order, $asc);
+        $paginatorAdapter = $this->getCustomerMapper()->createPaginatorAdapter($qb);
+        return new ZendPaginator($paginatorAdapter);
     }
 
     /**
@@ -70,7 +146,14 @@ class CustomerResource extends AbstractResourceListener
      */
     public function patch($id, $data)
     {
-        return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
+        $customer = $this->getCustomerMapper()->fetchOneBy(['uuid' => $id]);
+        if (is_null($customer)) {
+            return new ApiProblemResponse(new ApiProblem(404, "Data pelanggan tidak ditemukan!"));
+        }
+        $inputFilter = $this->getInputFilter();
+
+        $this->getCustomerService()->update($customer, $inputFilter);
+        return $customer;
     }
 
     /**
@@ -105,5 +188,25 @@ class CustomerResource extends AbstractResourceListener
     public function update($id, $data)
     {
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+    }
+
+    /**
+     * Get the value of customerService
+     */
+    public function getCustomerService()
+    {
+        return $this->customerService;
+    }
+
+    /**
+     * Set the value of customerService
+     *
+     * @return  self
+     */
+    public function setCustomerService($customerService)
+    {
+        $this->customerService = $customerService;
+
+        return $this;
     }
 }

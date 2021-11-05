@@ -10,6 +10,15 @@ class Module implements ApigilityProviderInterface
     {
         $serviceManager = $mvcEvent->getApplication()->getServiceManager();
 
+        //Customer
+        $customerService = $serviceManager->get(\Usage\V1\Service\Customer::class);
+        $customerEventListener = $serviceManager->get(\Usage\V1\Service\Listener\CustomerEventListener::class);
+        $customerEventListener->attach($customerService->getEventManager());
+
+        //Usage
+        $usageService = $serviceManager->get(\Usage\V1\Service\Usage::class);
+        $usageEventListener = $serviceManager->get(\Usage\V1\Service\Listener\UsageEventListener::class);
+        $usageEventListener->attach($usageService->getEventManager());
     }
 
     public function getConfig()

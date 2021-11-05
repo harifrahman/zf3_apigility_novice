@@ -5,6 +5,14 @@ class CustomerResourceFactory
 {
     public function __invoke($services)
     {
-        return new CustomerResource();
+        $userProfileMapper = $services->get('User\Mapper\UserProfile');
+        $customerMapper  = $services->get(\Usage\Mapper\Customer::class);
+        $customerService = $services->get(\Usage\V1\Service\Customer::class);
+        $resource = new CustomerResource(
+            $userProfileMapper,
+            $customerMapper
+        );
+        $resource->setCustomerService($customerService);
+        return $resource;
     }
 }

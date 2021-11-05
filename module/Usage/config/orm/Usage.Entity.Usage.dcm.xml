@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping">
+  <entity name="Usage\Entity\Usage" table="usage">
+    <indexes>
+      <index name="usage_user_profile_idx" columns="user_profile_uuid"/>
+      <index name="usage_customer_idx" columns="customer_uuid"/>
+    </indexes>
+    <id name="uuid" type="string" column="uuid" length="36">
+      <generator strategy="UUID"/>
+    </id>
+    <field name="usageId" type="string" column="usage_id" length="36" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="path" type="string" column="path" length="256" nullable="true">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
+    <field name="month" type="integer" column="month" nullable="true">
+      <options>
+        <option name="unsigned"/>
+      </options>
+    </field>
+    <field name="year" type="integer" column="year" nullable="true">
+      <options>
+        <option name="unsigned"/>
+      </options>
+    </field>
+    <field name="lastStandMeter" type="integer" column="last_stand_meter" nullable="true" />
+    <field name="currentMeter" type="integer" column="current_meter" nullable="true" />
+    <field name="usage" type="integer" column="usage" nullable="true" />
+    <field name="createdAt" type="datetime" column="created_at" nullable="true">
+      <gedmo:timestampable on="create"/>
+    </field>
+    <field name="updatedAt" type="datetime" column="updated_at" nullable="true">
+      <gedmo:timestampable on="update"/>
+    </field>
+    <field name="deletedAt" type="datetime" column="deleted_at" nullable="true" />
+    <gedmo:soft-deleteable field-name="deletedAt" time-aware="false" />
+    <many-to-one field="userProfile" target-entity="User\Entity\UserProfile" fetch="LAZY">
+      <join-columns>
+        <join-column name="user_profile_uuid" referenced-column-name="uuid"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="customer" target-entity="Usage\Entity\Customer" fetch="LAZY">
+      <join-columns>
+        <join-column name="customer_uuid" referenced-column-name="uuid"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

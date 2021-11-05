@@ -600,9 +600,9 @@ return [
             'route_identifier_name' => 'uuid',
             'collection_name' => 'profile',
             'entity_http_methods' => [
-                0 => 'GET',
-                2 => 'PUT',
-                3 => 'DELETE',
+                0 => 'PATCH',
+                1 => 'DELETE',
+                2 => 'GET',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
@@ -640,7 +640,7 @@ return [
             'User\\V1\\Rest\\Profile\\Controller' => [
                 'collection' => [
                     'GET' => false,
-                    'POST' => true,
+                    'POST' => false,
                     'PUT' => false,
                     'PATCH' => false,
                     'DELETE' => false,
@@ -649,8 +649,8 @@ return [
                     'GET' => false,
                     'POST' => false,
                     'PUT' => false,
-                    'PATCH' => true,
-                    'DELETE' => true,
+                    'PATCH' => false,
+                    'DELETE' => false,
                 ],
             ],
             'User\\V1\\Rpc\\Me\\Controller' => [
